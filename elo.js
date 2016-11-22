@@ -3,9 +3,8 @@
    var elo = { 
       default_rating: 1500,
       nSpread:        400,    // determines the 'spread' of the scale
-      setCalc:        false,  // win multipier is scaled by % sets won
-      kCalc:          k538,
-      kMultiplier:    kSet
+      kCalc:          k538,   // use calculation defined by FiveThirtyEight.com
+      kMultiplier:    kSet    // change to kDefault for value of 1
    };
 
    elo.processMatches = function(matches) {
@@ -56,6 +55,7 @@
 
    function kDefault() { return 1; }
 
+   // win multipier is scaled by % sets won
    // https://www.stat.berkeley.edu/~aldous/157/Old_Projects/huang.pdf
    function kSet(level, score) {
       return level == "G" ? (3 / score.split(' ').length) : (2 / score.split(' ').length);
