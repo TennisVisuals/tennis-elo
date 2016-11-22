@@ -1,5 +1,9 @@
 # tennis-elo
-Javascript implementation of Elo for Tennis inspired by [FiveThirtyEight.com](http://fivethirtyeight.com/features/serena-williams-and-the-difference-between-all-time-great-and-greatest-of-all-time/) (see footnote #3)
+Javascript implementation of Elo for Tennis 
+
+Following the lead of the team at [FiveThirtyEight.com](http://fivethirtyeight.com/features/serena-williams-and-the-difference-between-all-time-great-and-greatest-of-all-time/) (see footnote #3)
+
+Hat tip to [sleepomeno](https://github.com/sleepomeno/tennis_atp/blob/master/examples/elo.R) who implemented in R
 
 [requires .csv files from TennisAbstract](https://github.com/JeffSackmann/tennis_atp)
 
