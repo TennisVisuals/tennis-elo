@@ -3,9 +3,9 @@
    var elo = { 
       options: {}, 
       matches: [],
-      players: {},
       default_rating: 1500,
       nSpread: 400,          // determines the 'spread' of the scale
+      setCalc: false,        // win multipier is scaled by % sets won
       cacheURL: './cache/ta/matches/',
    };
 
@@ -17,38 +17,44 @@
    var ProgressBar      = require('progress');
    // var cmn              = require('./convenience')();
 
-   elo.processElo = function() {
-      elo.matches.forEach(match => {
-         if (!elo.players[match.winner_name]) elo.players[match.winner_name] = { rating: [], matches: 0 };
-         if (!elo.players[match.loser_name])  elo.players[match.loser_name] = { rating: [], matches: 0 };
-         elo.players[match.winner_name].matches += 1;
-         elo.players[match.loser_name].matches  += 1;
-         elo.updateElo(match.winner_name, match.loser_name, match.level, match.date);
+   elo.processElo = function(matches) {
+      var players = {};
+      matches.forEach(match => {
+         if (!players[match.winner_name]) players[match.winner_name] = { rating: [], matches: 0 };
+         if (!players[match.loser_name])  players[match.loser_name] = { rating: [], matches: 0 };
+         players[match.winner_name].matches += 1;
+         players[match.loser_name].matches  += 1;
+         elo.updateElo(players, match.winner_name, match.loser_name, match.score, match.level, match.date);
       });
+      return players;
    };
 
-   elo.updateElo = function(winner, loser, level, match_date) {
+   elo.updateElo = function(players, winner, loser, score, level, match_date) {
       if (!winner || !loser) return;
 
-      var w_rating = lastElement(elo.players[winner].rating) ? lastElement(elo.players[winner].rating).value : elo.default_rating;
-      var l_rating = lastElement(elo.players[loser].rating)  ? lastElement(elo.players[loser].rating).value  : elo.default_rating;
-      var w_matches = elo.players[winner].matches;
-      var l_matches = elo.players[loser].matches;
+      var w_rating = lastElement(players[winner].rating) ? lastElement(players[winner].rating).value : elo.default_rating;
+      var l_rating = lastElement(players[loser].rating)  ? lastElement(players[loser].rating).value  : elo.default_rating;
+      var w_matches = players[winner].matches;
+      var l_matches = players[loser].matches;
 
-      var calc = elo.calcElo(w_rating, w_matches, l_rating, l_matches, level);
+      var calc = elo.calcElo(w_rating, w_matches, l_rating, l_matches, score, level);
 
-      elo.players[winner].rating.push({ value: calc.winner, date: match_date });
-      elo.players[loser].rating.push( { value: calc.loser,  date: match_date });
+      players[winner].rating.push({ value: calc.winner, date: match_date });
+      players[loser].rating.push( { value: calc.loser,  date: match_date });
 
       function lastElement(arr) { return arr[arr.length - 1]; }
    }
 
-   elo.calcElo = function(w_rating, w_matches, l_rating, l_matches, level) {
+   elo.calcElo = function(w_rating, w_matches, l_rating, l_matches, score, level) {
+      var k = 1; // win multiplier
       var w_expect = 1 / (1 + Math.pow(10, ((l_rating - w_rating) / elo.nSpread)));
       var l_expect = 1 / (1 + Math.pow(10, ((w_rating - l_rating) / elo.nSpread)));
       var w_kValue = 250 / Math.pow(w_matches + 5, .4);
       var l_kValue = 250 / Math.pow(l_matches + 5, .4);
-      var k = level == "G" ? 1.1 : 1;
+      if (elo.setCalc) {
+         // https://www.stat.berkeley.edu/~aldous/157/Old_Projects/huang.pdf
+         k = level == "G" ? (3 / score.split(' ').length) : (2 / score.split(' ').length);
+      }
       var w_new_rating = w_rating + (k * w_kValue) * (1 - w_expect);
       var l_new_rating = l_rating + (k * l_kValue) * (0 - l_expect);
       return { winner: w_new_rating, loser: l_new_rating };
@@ -110,6 +116,8 @@
             // loser_name: cmn.normalizeName(row.loser_name),
             winner_name: row.winner_name,
             loser_name: row.loser_name,
+            score: row.score,
+            surface: row.surface,
             level: row.tourney_level,
             date: parseDate(row.tourney_date),
             num: +row.match_num
