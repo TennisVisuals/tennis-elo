@@ -1,5 +1,5 @@
 # tennis-elo
-Javascript implementation of Elo for Tennis inspired by [FiveThirtyEight.com](http://fivethirtyeight.com/features/djokovic-and-federer-are-vying-to-be-the-greatest-of-all-time/)
+Javascript implementation of Elo for Tennis inspired by [FiveThirtyEight.com](http://fivethirtyeight.com/features/serena-williams-and-the-difference-between-all-time-great-and-greatest-of-all-time/) (see footnote #3)
 
 [requires .csv files from TennisAbstract](https://github.com/JeffSackmann/tennis_atp)
 
