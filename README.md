@@ -9,20 +9,22 @@ Hat tip to [sleepomeno](https://github.com/sleepomeno/tennis_atp/blob/master/exa
 
 
 ```
+ t = require('./taLoad');
+ t.cacheURL = './';    // location of tennis abstract .csv files
+ t.parseArchives();
+
  elo = require('./elo');
- elo.cacheURL = './';    // location of tennis abstract .csv files
- elo.parseArchives();
  
- players = elo.processElo(elo.matches);
+ players = elo.processMatches(t.matches);
  players['Novak Djokovic'].rating;
  
- clay = elo.matches.filter(f=>f.surface == 'Clay');
- hard = elo.matches.filter(f=>f.surface == 'Hard');
- grass = elo.matches.filter(f=>f.surface == 'Grass');
+ clay = t.matches.filter(f=>f.surface == 'Clay');
+ hard = t.matches.filter(f=>f.surface == 'Hard');
+ grass = t.matches.filter(f=>f.surface == 'Grass');
  
- playersClay = elo.processElo(clay);
- playersHard = elo.processElo(hard);
- playersGrass = elo.processElo(grass);
+ playersClay = elo.processMatches(clay);
+ playersHard = elo.processMatches(hard);
+ playersGrass = elo.processMatches(grass);
 
  playersClay['Novak Djokovic'].rating
 ```
